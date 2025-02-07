@@ -1,0 +1,40 @@
+package com.example.repository
+
+import com.example.domain.Phone
+import com.example.tables
+
+import com.augustnagro.magnum.magzio.*
+import zio.*
+
+trait PhoneRepository:
+  def create(phone: Phone): UIO[Int]
+  def retrieve(phoneId: Int): UIO[Option[Phone]]
+  def update(phoneId: Int, phone: Phone): UIO[Unit]
+  def delete(phoneId: Int): UIO[Unit]
+
+final case class PhoneRepositoryLive(xa: Transactor)
+    extends Repo[tables.Phone.Creator, tables.Phone, Int]
+    with PhoneRepository:
+
+  override def create(phone: Phone): UIO[Int] =
+    xa.transact {
+      insertReturning(tables.Phone.Creator.fromDomain(phone)).id
+    }.orDie
+
+  override def retrieve(phoneId: Int): UIO[Option[Phone]] =
+    xa.transact {
+      findById(phoneId).map(_.toDomain)
+    }.orDie
+
+  override def update(phoneId: Int, phone: Phone): UIO[Unit] =
+    xa.transact {
+      update(tables.Phone.fromDomain(phoneId, phone))
+    }.orDie
+
+  override def delete(phoneId: Int): UIO[Unit] =
+    xa.transact {
+      deleteById(phoneId)
+    }.orDie
+
+object PhoneRepositoryLive:
+  val layer: URLayer[Transactor, PhoneRepository] = ZLayer.fromFunction(PhoneRepositoryLive(_))

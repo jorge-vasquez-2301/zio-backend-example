@@ -1,0 +1,42 @@
+package com.example.repository
+
+import com.example.domain.Phone
+import com.example.tables
+
+import com.augustnagro.magnum.magzio.*
+import zio.*
+
+trait EmployeePhoneRepository:
+  def addPhoneToEmployee(phoneId: Int, employeeId: Int): UIO[Unit]
+  def retrieveEmployeePhones(employeeId: Int): UIO[Vector[Phone]]
+  def removePhoneFromEmployee(phoneId: Int, employeeId: Int): UIO[Unit]
+
+final case class EmployeePhoneRepositoryLive(xa: Transactor)
+    extends Repo[tables.EmployeePhone, tables.EmployeePhone, Int]
+    with EmployeePhoneRepository:
+
+  override def addPhoneToEmployee(phoneId: Int, employeeId: Int): UIO[Unit] =
+    xa.transact {
+      insert(tables.EmployeePhone(employeeId, phoneId))
+    }.orDie
+
+  override def retrieveEmployeePhones(employeeId: Int): UIO[Vector[Phone]] =
+    xa.transact {
+      val statement =
+        sql"""
+          SELECT p.*
+          FROM phone p
+          INNER JOIN employee_phone ep ON ep.phone_id = p.id
+          WHERE ep.employee_id = $employeeId
+        """
+
+      statement.query[tables.Phone].run().map(_.toDomain)
+    }.orDie
+
+  override def removePhoneFromEmployee(phoneId: Int, employeeId: Int): UIO[Unit] =
+    xa.transact {
+      delete(tables.EmployeePhone(employeeId, phoneId))
+    }.orDie
+
+object EmployeePhoneRepositoryLive:
+  val layer: URLayer[Transactor, EmployeePhoneRepository] = ZLayer.fromFunction(EmployeePhoneRepositoryLive(_))
