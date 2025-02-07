@@ -11,6 +11,8 @@ final case class Department(
   val toDomain = domain.Department(name)
 
 object Department:
+  val table = TableInfo[Creator, Department, Int]
+
   def fromDomain(departmentId: Int, department: domain.Department): Department =
     Department(departmentId, department.name)
 

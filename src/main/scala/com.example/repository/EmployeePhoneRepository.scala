@@ -12,7 +12,7 @@ trait EmployeePhoneRepository:
   def removePhoneFromEmployee(phoneId: Int, employeeId: Int): UIO[Unit]
 
 final case class EmployeePhoneRepositoryLive(xa: Transactor)
-    extends Repo[tables.EmployeePhone, tables.EmployeePhone, Int]
+    extends Repo[tables.EmployeePhone, tables.EmployeePhone, Null]
     with EmployeePhoneRepository:
 
   override def addPhoneToEmployee(phoneId: Int, employeeId: Int): UIO[Unit] =
@@ -24,10 +24,10 @@ final case class EmployeePhoneRepositoryLive(xa: Transactor)
     xa.transact {
       val statement =
         sql"""
-          SELECT p.*
-          FROM phone p
-          INNER JOIN employee_phone ep ON ep.phone_id = p.id
-          WHERE ep.employee_id = $employeeId
+          SELECT ${tables.Phone.table.all}
+          FROM ${tables.Phone.table}
+          INNER JOIN ${tables.EmployeePhone.table} ON ${tables.EmployeePhone.table.phoneId} = ${tables.Phone.table.id}
+          WHERE ${tables.EmployeePhone.table.employeeId} = $employeeId
         """
 
       statement.query[tables.Phone].run().map(_.toDomain)

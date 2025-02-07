@@ -13,6 +13,8 @@ final case class Employee(
   val toDomain = domain.Employee(name, age, departmentId)
 
 object Employee:
+  val table = TableInfo[Creator, Employee, Int]
+
   def fromDomain(employeeId: Int, employee: domain.Employee): Employee =
     Employee(employeeId, employee.name, employee.age, employee.departmentId)
 

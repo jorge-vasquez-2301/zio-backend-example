@@ -11,6 +11,8 @@ final case class Phone(
   val toDomain = domain.Phone(number)
 
 object Phone:
+  val table = TableInfo[Creator, Phone, Int]
+
   def fromDomain(phoneId: Int, phone: domain.Phone): Phone = Phone(phoneId, phone.number)
 
   final case class Creator(number: String) derives DbCodec

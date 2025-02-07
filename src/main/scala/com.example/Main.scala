@@ -4,6 +4,7 @@ import com.augustnagro.magnum.magzio.*
 import zio.{ ZIO, ZIOAppDefault, ZLayer }
 import com.example.repository.*
 import com.example.domain.*
+import com.example.tables
 
 import scala.concurrent.duration.*
 import org.testcontainers.containers.PostgreSQLContainer
@@ -43,42 +44,42 @@ object Main extends ZIOAppDefault:
       xa.transact {
         val departmentTable =
           sql"""
-            CREATE TABLE department(
-              id   SERIAL      NOT NULL,
-              name VARCHAR(50) NOT NULL,
-              PRIMARY KEY(id)
+            CREATE TABLE ${tables.Department.table}(
+              ${tables.Department.table.id}   SERIAL      NOT NULL,
+              ${tables.Department.table.name} VARCHAR(50) NOT NULL,
+              PRIMARY KEY(${tables.Department.table.id})
             )
           """
 
         val employeeTable =
           sql"""
-            CREATE TABLE employee(
-              id            SERIAL       NOT NULL,
-              name          VARCHAR(100) NOT NULL,
-              age           INT          NOT NULL,
-              department_id INT          NOT NULL,
-              PRIMARY KEY (id),
-              FOREIGN KEY (department_id) REFERENCES department(id)
+            CREATE TABLE ${tables.Employee.table}(
+              ${tables.Employee.table.id}            SERIAL       NOT NULL,
+              ${tables.Employee.table.name}          VARCHAR(100) NOT NULL,
+              ${tables.Employee.table.age}           INT          NOT NULL,
+              ${tables.Employee.table.departmentId}  INT          NOT NULL,
+              PRIMARY KEY (${tables.Employee.table.id}),
+              FOREIGN KEY (${tables.Employee.table.departmentId}) REFERENCES ${tables.Department.table}(${tables.Department.table.id})
             )
           """
 
         val phoneTable =
           sql"""
-            CREATE TABLE phone(
-              id     SERIAL      NOT NULL,
-              number VARCHAR(15) NOT NULL,
-              PRIMARY KEY(id)
+            CREATE TABLE ${tables.Phone.table}(
+              ${tables.Phone.table.id}     SERIAL      NOT NULL,
+              ${tables.Phone.table.number} VARCHAR(15) NOT NULL,
+              PRIMARY KEY(${tables.Phone.table.id})
             )
           """
 
         val employeePhoneTable =
           sql"""
-            CREATE TABLE employee_phone(
-              employee_id INT NOT NULL,
-              phone_id    INT NOT NULL,
-              PRIMARY KEY (employee_id, phone_id),
-              FOREIGN KEY (employee_id) REFERENCES employee(id),
-              FOREIGN KEY (phone_id) REFERENCES phone(id)
+            CREATE TABLE ${tables.EmployeePhone.table}(
+              ${tables.EmployeePhone.table.employeeId} INT NOT NULL,
+              ${tables.EmployeePhone.table.phoneId}    INT NOT NULL,
+              PRIMARY KEY (${tables.EmployeePhone.table.employeeId}, ${tables.EmployeePhone.table.phoneId}),
+              FOREIGN KEY (${tables.EmployeePhone.table.employeeId}) REFERENCES ${tables.Employee.table}(${tables.Employee.table.id}),
+              FOREIGN KEY (${tables.EmployeePhone.table.phoneId}) REFERENCES ${tables.Phone.table}(${tables.Phone.table.id})
             )
           """
 
