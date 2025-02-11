@@ -1,17 +1,15 @@
 package com.example
 
 import com.augustnagro.magnum.magzio.*
-import zio.{ ZIO, ZIOAppDefault, ZLayer }
+import com.example.api.Router
 import com.example.repository.*
-import com.example.domain.*
-import com.example.tables
-
-import scala.concurrent.duration.*
+import com.example.service.*
+import com.zaxxer.hikari.{ HikariConfig, HikariDataSource }
 import org.testcontainers.containers.PostgreSQLContainer
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
+import zio.*
+import zio.http.*
 
-object Main extends ZIOAppDefault:
+object Main extends ZIOAppDefault with Router:
   val postgresContainerLayer =
     ZLayer.scoped {
       ZIO.fromAutoCloseable {
@@ -103,30 +101,17 @@ object Main extends ZIOAppDefault:
     yield xa
 
   val run =
-    (for
-      departmentId <- ZIO.serviceWithZIO[DepartmentRepository](_.create(Department("test")))
-      _            <- ZIO.serviceWithZIO[DepartmentRepository](_.retrieve(departmentId)).debug("department")
-      _            <- ZIO.serviceWithZIO[DepartmentRepository](_.update(departmentId, Department("new test")))
-      _            <- ZIO.serviceWithZIO[DepartmentRepository](_.retrieve(departmentId)).debug("updated department")
-      employeeId   <- ZIO.serviceWithZIO[EmployeeRepository](_.create(Employee("test", 30, departmentId)))
-      _            <- ZIO.serviceWithZIO[EmployeeRepository](_.retrieve(employeeId)).debug("employee")
-      _            <- ZIO.serviceWithZIO[EmployeeRepository](_.update(employeeId, Employee("new test", 40, departmentId)))
-      _            <- ZIO.serviceWithZIO[EmployeeRepository](_.retrieve(employeeId)).debug("updated employee")
-      phoneId      <- ZIO.serviceWithZIO[PhoneRepository](_.create(Phone("5252525")))
-      _            <- ZIO.serviceWithZIO[PhoneRepository](_.retrieve(phoneId)).debug("phone")
-      _            <- ZIO.serviceWithZIO[PhoneRepository](_.update(phoneId, Phone("7272727")))
-      _            <- ZIO.serviceWithZIO[PhoneRepository](_.retrieve(phoneId)).debug("updated phone")
-      _            <- ZIO.serviceWithZIO[EmployeePhoneRepository](_.addPhoneToEmployee(phoneId, employeeId))
-      _            <- ZIO.serviceWithZIO[EmployeePhoneRepository](_.retrieveEmployeePhones(employeeId)).debug("employeePhones")
-      _            <- ZIO.serviceWithZIO[EmployeePhoneRepository](_.removePhoneFromEmployee(phoneId, employeeId))
-      _            <- ZIO.serviceWithZIO[EmployeePhoneRepository](_.retrieveEmployeePhones(employeeId)).debug("employeePhones")
-      _            <- ZIO.serviceWithZIO[PhoneRepository](_.delete(phoneId))
-      _            <- ZIO.serviceWithZIO[EmployeeRepository](_.delete(employeeId))
-      _            <- ZIO.serviceWithZIO[DepartmentRepository](_.delete(departmentId))
-    yield ()).provide(
-      DepartmentRepositoryLive.layer,
-      EmployeeRepositoryLive.layer,
-      PhoneRepositoryLive.layer,
-      EmployeePhoneRepositoryLive.layer,
-      dbLayer
-    )
+    Server
+      .serve(routes ++ swaggerRoutes)
+      .provide(
+        Server.default,
+        DepartmentServiceLive.layer,
+        DepartmentRepositoryLive.layer,
+        EmployeeServiceLive.layer,
+        EmployeeRepositoryLive.layer,
+        PhoneServiceLive.layer,
+        PhoneRepositoryLive.layer,
+        EmployeePhoneServiceLive.layer,
+        EmployeePhoneRepositoryLive.layer,
+        dbLayer
+      )

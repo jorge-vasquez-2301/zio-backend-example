@@ -1,9 +1,8 @@
 package com.example.repository
 
+import com.augustnagro.magnum.magzio.*
 import com.example.domain.Phone
 import com.example.tables
-
-import com.augustnagro.magnum.magzio.*
 import zio.*
 
 trait EmployeePhoneRepository:
