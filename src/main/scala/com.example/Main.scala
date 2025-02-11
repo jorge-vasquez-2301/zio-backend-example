@@ -10,38 +10,33 @@ import zio.*
 import zio.http.*
 
 object Main extends ZIOAppDefault with Router:
-  val postgresContainerLayer =
-    ZLayer.scoped {
-      ZIO.fromAutoCloseable {
-        ZIO.attemptBlockingIO {
-          val container = PostgreSQLContainer("postgres:13.18-alpine3.20")
-          container.withDatabaseName("example")
-          container.withUsername("sa")
-          container.withPassword("sa")
-          container.start()
-          container
-        }
+  val startPostgresContainer =
+    ZIO.fromAutoCloseable {
+      ZIO.attemptBlockingIO {
+        val container = PostgreSQLContainer("postgres:13.18-alpine3.20")
+        container.withDatabaseName("example")
+        container.withUsername("sa")
+        container.withPassword("sa")
+        container.start()
+        container
       }
     }
 
-  def dataSourceLayer(jdbcUrl: String, username: String, password: String) =
-    ZLayer.scoped {
-      ZIO.fromAutoCloseable {
-        ZIO.attemptBlockingIO {
-          val config = HikariConfig()
-          config.setJdbcUrl(jdbcUrl)
-          config.setUsername(username)
-          config.setPassword(password)
-          HikariDataSource(config)
-        }
+  def createDataSource(jdbcUrl: String, username: String, password: String) =
+    ZIO.fromAutoCloseable {
+      ZIO.attemptBlockingIO {
+        val config = HikariConfig()
+        config.setJdbcUrl(jdbcUrl)
+        config.setUsername(username)
+        config.setPassword(password)
+        HikariDataSource(config)
       }
     }
 
-  def createTablesLayer(xa: Transactor) =
-    ZLayer {
-      xa.transact {
-        val departmentTable =
-          sql"""
+  def createTables(xa: Transactor) =
+    xa.transact {
+      val departmentTable =
+        sql"""
             CREATE TABLE ${tables.Department.table}(
               ${tables.Department.table.id}   SERIAL      NOT NULL,
               ${tables.Department.table.name} VARCHAR(50) NOT NULL,
@@ -49,8 +44,8 @@ object Main extends ZIOAppDefault with Router:
             )
           """
 
-        val employeeTable =
-          sql"""
+      val employeeTable =
+        sql"""
             CREATE TABLE ${tables.Employee.table}(
               ${tables.Employee.table.id}            SERIAL       NOT NULL,
               ${tables.Employee.table.name}          VARCHAR(100) NOT NULL,
@@ -61,8 +56,8 @@ object Main extends ZIOAppDefault with Router:
             )
           """
 
-        val phoneTable =
-          sql"""
+      val phoneTable =
+        sql"""
             CREATE TABLE ${tables.Phone.table}(
               ${tables.Phone.table.id}     SERIAL      NOT NULL,
               ${tables.Phone.table.number} VARCHAR(15) NOT NULL,
@@ -70,8 +65,8 @@ object Main extends ZIOAppDefault with Router:
             )
           """
 
-        val employeePhoneTable =
-          sql"""
+      val employeePhoneTable =
+        sql"""
             CREATE TABLE ${tables.EmployeePhone.table}(
               ${tables.EmployeePhone.table.employeeId} INT NOT NULL,
               ${tables.EmployeePhone.table.phoneId}    INT NOT NULL,
@@ -81,23 +76,29 @@ object Main extends ZIOAppDefault with Router:
             )
           """
 
-        departmentTable.update.run()
-        employeeTable.update.run()
-        phoneTable.update.run()
-        employeePhoneTable.update.run()
-      }
+      departmentTable.update.run()
+      employeeTable.update.run()
+      phoneTable.update.run()
+      employeePhoneTable.update.run()
+    }
+
+  val dataSourceLayer =
+    ZLayer.scoped {
+      for
+        postgresContainer <- startPostgresContainer
+        dataSource        <- createDataSource(
+                               postgresContainer.getJdbcUrl(),
+                               postgresContainer.getUsername(),
+                               postgresContainer.getPassword()
+                             )
+      yield dataSource
     }
 
   val dbLayer =
     for
-      postgresContainer <- postgresContainerLayer
-      dataSource        <- dataSourceLayer(
-                             postgresContainer.get.getJdbcUrl(),
-                             postgresContainer.get.getUsername(),
-                             postgresContainer.get.getPassword()
-                           )
-      xa                <- Transactor.layer(dataSource.get)
-      _                 <- createTablesLayer(xa.get)
+      dataSource <- dataSourceLayer
+      xa         <- Transactor.layer(dataSource.get)
+      _          <- ZLayer(createTables(xa.get))
     yield xa
 
   val run =
