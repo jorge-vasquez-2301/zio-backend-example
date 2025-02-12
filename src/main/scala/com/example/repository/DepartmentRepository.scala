@@ -14,12 +14,12 @@ trait DepartmentRepository:
   def delete(departmentId: Int): UIO[Unit]
 
 final case class DepartmentRepositoryLive(xa: Transactor)
-    extends Repo[tables.Department.Creator, tables.Department, Int]
+    extends Repo[Department, tables.Department, Int]
     with DepartmentRepository:
 
   override def create(department: Department): UIO[Int] =
     xa.transact {
-      insertReturning(tables.Department.Creator.fromDomain(department)).id
+      insertReturning(department).id
     }.orDie
 
   override def retrieve(departmentId: Int): UIO[Option[Department]] =

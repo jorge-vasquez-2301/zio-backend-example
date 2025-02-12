@@ -2,7 +2,7 @@ package com.example.api
 
 import com.example.api.endpoint.*
 import com.example.api.handler.*
-import com.example.dto.*
+import com.example.domain.*
 import com.example.service.{ DepartmentService, EmployeePhoneService, EmployeeService, PhoneService }
 import zio.*
 import zio.http.*

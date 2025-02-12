@@ -11,11 +11,7 @@ final case class Department(
   val toDomain = domain.Department(name)
 
 object Department:
-  val table = TableInfo[Creator, Department, Int]
+  val table = TableInfo[domain.Department, Department, Int]
 
   def fromDomain(departmentId: Int, department: domain.Department): Department =
     Department(departmentId, department.name)
-
-  final case class Creator(name: String) derives DbCodec
-  object Creator:
-    def fromDomain(department: domain.Department): Creator = Creator(department.name)

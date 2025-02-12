@@ -12,13 +12,11 @@ trait PhoneRepository:
   def update(phoneId: Int, phone: Phone): UIO[Unit]
   def delete(phoneId: Int): UIO[Unit]
 
-final case class PhoneRepositoryLive(xa: Transactor)
-    extends Repo[tables.Phone.Creator, tables.Phone, Int]
-    with PhoneRepository:
+final case class PhoneRepositoryLive(xa: Transactor) extends Repo[Phone, tables.Phone, Int] with PhoneRepository:
 
   override def create(phone: Phone): UIO[Int] =
     xa.transact {
-      insertReturning(tables.Phone.Creator.fromDomain(phone)).id
+      insertReturning(phone).id
     }.orDie
 
   override def retrieve(phoneId: Int): UIO[Option[Phone]] =

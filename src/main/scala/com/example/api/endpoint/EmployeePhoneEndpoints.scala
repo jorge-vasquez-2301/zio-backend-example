@@ -1,6 +1,6 @@
 package com.example.api.endpoint
 
-import com.example.dto.*
+import com.example.domain.*
 import com.example.error.AppError
 import com.example.error.AppError.EmployeeNotFound
 import zio.http.*
@@ -15,8 +15,8 @@ trait EmployeePhoneEndpoints:
       ?? Doc.p("Add a phone to an employee")
 
   val retrieveEmployeePhones =
-    Endpoint(Method.GET / "employee" / int("id"))
-      .out[Vector[PhoneDTO]](Doc.p("List of employee's phones"))
+    Endpoint(Method.GET / "employee" / int("id") / "phone")
+      .out[Vector[Phone]](Doc.p("List of employee's phones"))
       .outError[EmployeeNotFound](Status.NotFound, Doc.p("The employee was not found"))
       ?? Doc.p("Obtain a list of a employee's phones")
 

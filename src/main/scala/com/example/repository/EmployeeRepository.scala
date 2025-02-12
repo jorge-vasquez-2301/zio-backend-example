@@ -13,12 +13,12 @@ trait EmployeeRepository:
   def delete(employeeId: Int): UIO[Unit]
 
 final case class EmployeeRepositoryLive(xa: Transactor)
-    extends Repo[tables.Employee.Creator, tables.Employee, Int]
+    extends Repo[Employee, tables.Employee, Int]
     with EmployeeRepository:
 
   override def create(employee: Employee): UIO[Int] =
     xa.transact {
-      insertReturning(tables.Employee.Creator.fromDomain(employee)).id
+      insertReturning(employee).id
     }.orDie
 
   override def retrieve(employeeId: Int): UIO[Option[Employee]] =
