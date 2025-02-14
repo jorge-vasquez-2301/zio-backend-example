@@ -9,8 +9,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import zio.*
 import zio.http.*
 import zio.logging.jul.bridge.JULBridge
-import zio.logging.{ consoleLogger, ConsoleLoggerConfig, LogFilter, LogFormat }
-import zio.logging.LoggerNameExtractor
+import zio.logging.{ConsoleLoggerConfig, LogFilter, LogFormat, LoggerNameExtractor, consoleLogger}
 
 object Main extends ZIOAppDefault with Router:
   val logFormat =

@@ -8,22 +8,22 @@ import io.github.iltotore.iron.*
 import zio.*
 
 trait PhoneRepository:
-  def create(phone: Phone): UIO[Int :| PhoneId]
-  def retrieve(phoneId: Int :| PhoneId): UIO[Option[Phone]]
+  def create(phone: Phone): UIO[PhoneId]
+  def retrieve(phoneId: PhoneId): UIO[Option[Phone]]
   def retrieveByNumber(phoneNumber: String): UIO[Option[Phone]]
-  def update(phoneId: Int :| PhoneId, phone: Phone): UIO[Unit]
-  def delete(phoneId: Int :| PhoneId): UIO[Unit]
+  def update(phoneId: PhoneId, phone: Phone): UIO[Unit]
+  def delete(phoneId: PhoneId): UIO[Unit]
 
 final case class PhoneRepositoryLive(xa: Transactor)
-    extends Repo[Phone, tables.Phone, Int :| PhoneId]
+    extends Repo[Phone, tables.Phone, PhoneId]
     with PhoneRepository:
 
-  override def create(phone: Phone): UIO[Int :| PhoneId] =
+  override def create(phone: Phone): UIO[PhoneId] =
     xa.transact {
       insertReturning(phone).id
     }.orDie
 
-  override def retrieve(phoneId: Int :| PhoneId): UIO[Option[Phone]] =
+  override def retrieve(phoneId: PhoneId): UIO[Option[Phone]] =
     xa.transact {
       findById(phoneId).map(_.toDomain)
     }.orDie
@@ -35,12 +35,12 @@ final case class PhoneRepositoryLive(xa: Transactor)
       findAll(spec).headOption.map(_.toDomain)
     }.orDie
 
-  override def update(phoneId: Int :| PhoneId, phone: Phone): UIO[Unit] =
+  override def update(phoneId: PhoneId, phone: Phone): UIO[Unit] =
     xa.transact {
       update(tables.Phone.fromDomain(phoneId, phone))
     }.orDie
 
-  override def delete(phoneId: Int :| PhoneId): UIO[Unit] =
+  override def delete(phoneId: PhoneId): UIO[Unit] =
     xa.transact {
       deleteById(phoneId)
     }.orDie

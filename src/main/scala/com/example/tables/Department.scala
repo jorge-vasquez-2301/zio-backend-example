@@ -8,13 +8,13 @@ import io.github.iltotore.iron.*
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
 final case class Department(
-  @Id id: Int :| DepartmentId,
-  name: String :| DepartmentName
+  @Id id: DepartmentId,
+  name: DepartmentName
 ) derives DbCodec:
   val toDomain = domain.Department(name)
 
 object Department:
-  val table = TableInfo[domain.Department, Department, Int :| DepartmentId]
+  val table = TableInfo[domain.Department, Department, DepartmentId]
 
-  def fromDomain(departmentId: Int :| DepartmentId, department: domain.Department): Department =
+  def fromDomain(departmentId: DepartmentId, department: domain.Department): Department =
     Department(departmentId, department.name)

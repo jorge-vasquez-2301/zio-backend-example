@@ -8,15 +8,15 @@ import io.github.iltotore.iron.*
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
 final case class Employee(
-  @Id id: Int :| EmployeeId,
-  name: String :| EmployeeName,
-  age: Int :| Age,
-  departmentId: Int :| DepartmentId
+  @Id id: EmployeeId,
+  name: EmployeeName,
+  age: Age,
+  departmentId: DepartmentId
 ) derives DbCodec:
   val toDomain = domain.Employee(name, age, departmentId)
 
 object Employee:
-  val table = TableInfo[domain.Employee, Employee, Int :| EmployeeId]
+  val table = TableInfo[domain.Employee, Employee, EmployeeId]
 
-  def fromDomain(employeeId: Int :| EmployeeId, employee: domain.Employee): Employee =
+  def fromDomain(employeeId: EmployeeId, employee: domain.Employee): Employee =
     Employee(employeeId, employee.name, employee.age, employee.departmentId)

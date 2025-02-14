@@ -12,7 +12,7 @@ trait DepartmentEndpoints extends Codecs:
   val createDepartment =
     Endpoint(Method.POST / "department")
       .in[Department](Doc.p("Department to be created"))
-      .out[Int :| DepartmentId](Doc.p("ID of the created department"))
+      .out[DepartmentId](Doc.p("ID of the created department"))
       .outError[DepartmentAlreadyExists](Status.Conflict, Doc.p("The department already exists"))
       ?? Doc.p("Create a new department")
 
@@ -21,19 +21,18 @@ trait DepartmentEndpoints extends Codecs:
       .out[Vector[Department]](Doc.p("List of departments")) ?? Doc.p("Obtain a list of all departments")
 
   val getDepartmentById =
-    Endpoint(Method.GET / "department" / idCodec[DepartmentId])
+    Endpoint(Method.GET / "department" / idCodec[DepartmentIdDescription])
       .out[Department](Doc.p("Department"))
       .outError[DepartmentNotFound](Status.NotFound, Doc.p("The department was not found"))
       ?? Doc.p("Obtain the department with the given `id`")
 
   val updateDepartment =
-    Endpoint(Method.PUT / "department" / idCodec[DepartmentId])
+    Endpoint(Method.PUT / "department" / idCodec[DepartmentIdDescription])
       .in[Department](Doc.p("Department to be updated"))
       .out[Unit]
       .outError[DepartmentNotFound](Status.NotFound, Doc.p("The department was not found"))
       ?? Doc.p("Update the department with the given `id`")
 
   val deleteDepartment =
-    Endpoint(Method.DELETE / "department" / idCodec[DepartmentId]).out[Unit] ?? Doc.p(
-      "Delete the department with the given `id`"
-    )
+    Endpoint(Method.DELETE / "department" / idCodec[DepartmentIdDescription]).out[Unit]
+      ?? Doc.p("Delete the department with the given `id`")

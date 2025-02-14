@@ -7,8 +7,8 @@ import io.github.iltotore.iron.*
 
 @Table(PostgresDbType, SqlNameMapper.CamelToSnakeCase)
 final case class EmployeePhone(
-  employeeId: Int :| EmployeeId,
-  phoneId: Int :| PhoneId
+  employeeId: EmployeeId,
+  phoneId: PhoneId
 ) derives DbCodec
 
 object EmployeePhone:

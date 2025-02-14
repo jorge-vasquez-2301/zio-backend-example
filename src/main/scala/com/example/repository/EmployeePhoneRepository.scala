@@ -8,20 +8,20 @@ import io.github.iltotore.iron.*
 import zio.*
 
 trait EmployeePhoneRepository:
-  def addPhoneToEmployee(phoneId: Int :| PhoneId, employeeId: Int :| EmployeeId): UIO[Unit]
-  def retrieveEmployeePhones(employeeId: Int :| EmployeeId): UIO[Vector[Phone]]
-  def removePhoneFromEmployee(phoneId: Int :| PhoneId, employeeId: Int :| EmployeeId): UIO[Unit]
+  def addPhoneToEmployee(phoneId: PhoneId, employeeId: EmployeeId): UIO[Unit]
+  def retrieveEmployeePhones(employeeId: EmployeeId): UIO[Vector[Phone]]
+  def removePhoneFromEmployee(phoneId: PhoneId, employeeId: EmployeeId): UIO[Unit]
 
 final case class EmployeePhoneRepositoryLive(xa: Transactor)
     extends Repo[tables.EmployeePhone, tables.EmployeePhone, Null]
     with EmployeePhoneRepository:
 
-  override def addPhoneToEmployee(phoneId: Int :| PhoneId, employeeId: Int :| EmployeeId): UIO[Unit] =
+  override def addPhoneToEmployee(phoneId: PhoneId, employeeId: EmployeeId): UIO[Unit] =
     xa.transact {
       insert(tables.EmployeePhone(employeeId, phoneId))
     }.orDie
 
-  override def retrieveEmployeePhones(employeeId: Int :| EmployeeId): UIO[Vector[Phone]] =
+  override def retrieveEmployeePhones(employeeId: EmployeeId): UIO[Vector[Phone]] =
     xa.transact {
       val statement =
         sql"""
@@ -34,7 +34,7 @@ final case class EmployeePhoneRepositoryLive(xa: Transactor)
       statement.query[tables.Phone].run().map(_.toDomain)
     }.orDie
 
-  override def removePhoneFromEmployee(phoneId: Int :| PhoneId, employeeId: Int :| EmployeeId): UIO[Unit] =
+  override def removePhoneFromEmployee(phoneId: PhoneId, employeeId: EmployeeId): UIO[Unit] =
     xa.transact {
       delete(tables.EmployeePhone(employeeId, phoneId))
     }.orDie

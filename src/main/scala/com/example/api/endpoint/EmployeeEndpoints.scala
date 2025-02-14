@@ -12,7 +12,7 @@ trait EmployeeEndpoints extends Codecs:
   val createEmployee =
     Endpoint(Method.POST / "employee")
       .in[Employee](Doc.p("Employee to be created"))
-      .out[Int :| EmployeeId](Doc.p("ID of the created employee"))
+      .out[EmployeeId](Doc.p("ID of the created employee"))
       .outError[DepartmentNotFound](Status.NotFound, Doc.p("The employee's department was not found"))
       ?? Doc.p("Create a new employee")
 
@@ -21,19 +21,18 @@ trait EmployeeEndpoints extends Codecs:
       .out[Vector[Employee]](Doc.p("List of employees")) ?? Doc.p("Obtain a list of employees")
 
   val getEmployeeById =
-    Endpoint(Method.GET / "employee" / idCodec[EmployeeId])
+    Endpoint(Method.GET / "employee" / idCodec[EmployeeIdDescription])
       .out[Employee](Doc.p("Employee"))
       .outError[EmployeeNotFound](Status.NotFound, Doc.p("The employee was not found"))
       ?? Doc.p("Obtain the employee with the given `id`")
 
   val updateEmployee =
-    Endpoint(Method.PUT / "employee" / idCodec[EmployeeId])
+    Endpoint(Method.PUT / "employee" / idCodec[EmployeeIdDescription])
       .in[Employee](Doc.p("Employee to be updated"))
       .out[Unit]
       .outError[EmployeeNotFound](Status.NotFound, Doc.p("The employee was not found"))
       ?? Doc.p("Update the employee with the given `id`")
 
   val deleteEmployee =
-    Endpoint(Method.DELETE / "employee" / idCodec[EmployeeId]).out[Unit] ?? Doc.p(
-      "Delete the employee with the given `id`"
-    )
+    Endpoint(Method.DELETE / "employee" / idCodec[EmployeeIdDescription]).out[Unit]
+      ?? Doc.p("Delete the employee with the given `id`")
