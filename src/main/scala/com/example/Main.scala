@@ -8,8 +8,29 @@ import com.zaxxer.hikari.{ HikariConfig, HikariDataSource }
 import org.testcontainers.containers.PostgreSQLContainer
 import zio.*
 import zio.http.*
+import zio.logging.jul.bridge.JULBridge
+import zio.logging.{ consoleLogger, ConsoleLoggerConfig, LogFilter, LogFormat }
+import zio.logging.LoggerNameExtractor
 
 object Main extends ZIOAppDefault with Router:
+  val logFormat =
+    LogFormat.label("name", LoggerNameExtractor.loggerNameAnnotationOrTrace.toLogFormat())
+      + LogFormat.space
+      + LogFormat.default
+      + LogFormat.space
+      + LogFormat.allAnnotations
+
+  val logFilterConfig =
+    LogFilter.LogLevelByNameConfig(
+      LogLevel.Info,
+      "com.augustnagro.magnum" -> LogLevel.Debug
+    )
+
+  override val bootstrap =
+    Runtime.removeDefaultLoggers
+      ++ consoleLogger(ConsoleLoggerConfig(logFormat, logFilterConfig))
+      ++ JULBridge.init(logFilterConfig.toFilter)
+
   val startPostgresContainer =
     ZIO.fromAutoCloseable {
       ZIO.attemptBlockingIO {
@@ -87,9 +108,9 @@ object Main extends ZIOAppDefault with Router:
       for
         postgresContainer <- startPostgresContainer
         dataSource        <- createDataSource(
-                               postgresContainer.getJdbcUrl(),
-                               postgresContainer.getUsername(),
-                               postgresContainer.getPassword()
+                               postgresContainer.getJdbcUrl,
+                               postgresContainer.getUsername,
+                               postgresContainer.getPassword
                              )
       yield dataSource
     }

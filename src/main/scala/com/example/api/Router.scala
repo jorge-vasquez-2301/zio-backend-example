@@ -36,7 +36,7 @@ trait Router
       addPhoneToEmployee.implementHandler(handler(addPhoneToEmployeeHandler)),
       retrieveEmployeePhones.implementHandler(handler(retrieveEmployeePhonesHandler)),
       removePhoneFromEmployee.implementHandler(handler(removePhoneFromEmployeeHandler))
-    )
+    ) @@ Middleware.requestLogging(logRequestBody = true, logResponseBody = true)
 
   val swaggerRoutes =
     SwaggerUI.routes(
