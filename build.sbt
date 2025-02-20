@@ -13,13 +13,17 @@ lazy val root = (project in file("."))
       "-Wunused:imports"
     ),
     libraryDependencies ++= Seq(
+      // ZIO HTTP
       "dev.zio"            %% "zio-http"               % "3.0.1",
-      "dev.zio"            %% "zio-logging-jul-bridge" % "2.4.0",
+      // Database
       "com.augustnagro"    %% "magnumzio"              % "2.0.0-M1",
-      "io.github.iltotore" %% "iron"                   % "2.6.0",
       "org.postgresql"      % "postgresql"             % "42.7.5",
       "org.testcontainers"  % "testcontainers"         % "1.20.4",
       "org.testcontainers"  % "postgresql"             % "1.20.4",
-      "com.zaxxer"          % "HikariCP"               % "6.2.1"
+      "com.zaxxer"          % "HikariCP"               % "6.2.1",
+      // Iron
+      "io.github.iltotore" %% "iron"                   % "2.6.0",
+      // Logging
+      "dev.zio"            %% "zio-logging-jul-bridge" % "2.4.0"
     )
   )
