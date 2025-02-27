@@ -9,7 +9,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import zio.*
 import zio.http.*
 import zio.logging.jul.bridge.JULBridge
-import zio.logging.{ConsoleLoggerConfig, LogFilter, LogFormat, LoggerNameExtractor, consoleLogger}
+import zio.logging.{ consoleLogger, ConsoleLoggerConfig, LogFilter, LogFormat, LoggerNameExtractor }
 
 object Main extends ZIOAppDefault with Router:
   val logFormat =
@@ -72,7 +72,7 @@ object Main extends ZIOAppDefault with Router:
               ${tables.Employee.table.age}           INT          NOT NULL,
               ${tables.Employee.table.departmentId}  INT          NOT NULL,
               PRIMARY KEY (${tables.Employee.table.id}),
-              FOREIGN KEY (${tables.Employee.table.departmentId}) REFERENCES ${tables.Department.table}(${tables.Department.table.id})
+              FOREIGN KEY (${tables.Employee.table.departmentId}) REFERENCES ${tables.Department.table}(${tables.Department.table.id}) ON DELETE CASCADE
             )
           """
 
@@ -91,8 +91,8 @@ object Main extends ZIOAppDefault with Router:
               ${tables.EmployeePhone.table.employeeId} INT NOT NULL,
               ${tables.EmployeePhone.table.phoneId}    INT NOT NULL,
               PRIMARY KEY (${tables.EmployeePhone.table.employeeId}, ${tables.EmployeePhone.table.phoneId}),
-              FOREIGN KEY (${tables.EmployeePhone.table.employeeId}) REFERENCES ${tables.Employee.table}(${tables.Employee.table.id}),
-              FOREIGN KEY (${tables.EmployeePhone.table.phoneId}) REFERENCES ${tables.Phone.table}(${tables.Phone.table.id})
+              FOREIGN KEY (${tables.EmployeePhone.table.employeeId}) REFERENCES ${tables.Employee.table}(${tables.Employee.table.id}) ON DELETE CASCADE,
+              FOREIGN KEY (${tables.EmployeePhone.table.phoneId}) REFERENCES ${tables.Phone.table}(${tables.Phone.table.id}) ON DELETE CASCADE
             )
           """
 
