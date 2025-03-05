@@ -5,5 +5,5 @@ import zio.http.*
 import zio.http.codec.*
 
 trait Codecs:
-  inline def idCodec[T](using Constraint[Int, T]): PathCodec[Int :| T] =
-    int("id").transformOrFail[IronType[Int, T]](_.refineEither[T])(Right(_))
+  inline def idCodec[Description](using Constraint[Int, Description]): PathCodec[Int :| Description] =
+    int("id").transformOrFail[Int :| Description](_.refineEither[Description])(Right(_))
