@@ -21,18 +21,18 @@ trait DepartmentEndpoints extends Codecs:
       .out[Vector[Department]](Doc.p("List of departments")) ?? Doc.p("Obtain a list of all departments")
 
   val getDepartmentById =
-    Endpoint(Method.GET / "department" / idCodec[DepartmentIdDescription])
+    Endpoint(Method.GET / "department" / idCodec[DepartmentIdDescription]())
       .out[Department](Doc.p("Department"))
       .outError[DepartmentNotFound](Status.NotFound, Doc.p("The department was not found"))
       ?? Doc.p("Obtain the department with the given `id`")
 
   val updateDepartment =
-    Endpoint(Method.PUT / "department" / idCodec[DepartmentIdDescription])
+    Endpoint(Method.PUT / "department" / idCodec[DepartmentIdDescription]())
       .in[Department](Doc.p("Department to be updated"))
       .out[Unit]
       .outError[DepartmentNotFound](Status.NotFound, Doc.p("The department was not found"))
       ?? Doc.p("Update the department with the given `id`")
 
   val deleteDepartment =
-    Endpoint(Method.DELETE / "department" / idCodec[DepartmentIdDescription]).out[Unit]
+    Endpoint(Method.DELETE / "department" / idCodec[DepartmentIdDescription]()).out[Unit]
       ?? Doc.p("Delete the department with the given `id`")

@@ -21,18 +21,18 @@ trait EmployeeEndpoints extends Codecs:
       .out[Vector[Employee]](Doc.p("List of employees")) ?? Doc.p("Obtain a list of employees")
 
   val getEmployeeById =
-    Endpoint(Method.GET / "employee" / idCodec[EmployeeIdDescription])
+    Endpoint(Method.GET / "employee" / idCodec[EmployeeIdDescription]())
       .out[Employee](Doc.p("Employee"))
       .outError[EmployeeNotFound](Status.NotFound, Doc.p("The employee was not found"))
       ?? Doc.p("Obtain the employee with the given `id`")
 
   val updateEmployee =
-    Endpoint(Method.PUT / "employee" / idCodec[EmployeeIdDescription])
+    Endpoint(Method.PUT / "employee" / idCodec[EmployeeIdDescription]())
       .in[Employee](Doc.p("Employee to be updated"))
       .out[Unit]
       .outError[EmployeeNotFound](Status.NotFound, Doc.p("The employee was not found"))
       ?? Doc.p("Update the employee with the given `id`")
 
   val deleteEmployee =
-    Endpoint(Method.DELETE / "employee" / idCodec[EmployeeIdDescription]).out[Unit]
+    Endpoint(Method.DELETE / "employee" / idCodec[EmployeeIdDescription]()).out[Unit]
       ?? Doc.p("Delete the employee with the given `id`")

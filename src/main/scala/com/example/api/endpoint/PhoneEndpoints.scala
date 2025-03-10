@@ -17,18 +17,18 @@ trait PhoneEndpoints extends Codecs:
       ?? Doc.p("Create a new phone")
 
   val getPhoneById =
-    Endpoint(Method.GET / "phone" / idCodec[PhoneIdDescription])
+    Endpoint(Method.GET / "phone" / idCodec[PhoneIdDescription]())
       .out[Phone](Doc.p("Phone"))
       .outError[PhoneNotFound](Status.NotFound, Doc.p("The phone was not found"))
       ?? Doc.p("Obtain the phone with the given `id`")
 
   val updatePhone =
-    Endpoint(Method.PUT / "phone" / idCodec[PhoneIdDescription])
+    Endpoint(Method.PUT / "phone" / idCodec[PhoneIdDescription]())
       .in[Phone](Doc.p("Phone to be updated"))
       .out[Unit]
       .outError[PhoneNotFound](Status.NotFound, Doc.p("The phone was not found"))
       ?? Doc.p("Update the phone with the given `id`")
 
   val deletePhone =
-    Endpoint(Method.DELETE / "phone" / idCodec[PhoneIdDescription]).out[Unit]
+    Endpoint(Method.DELETE / "phone" / idCodec[PhoneIdDescription]()).out[Unit]
       ?? Doc.p("Delete the phone with the given `id`")
