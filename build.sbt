@@ -1,6 +1,6 @@
 ThisBuild / version := "0.1.0-SNAPSHOT"
 
-ThisBuild / scalaVersion := "3.3.5"
+ThisBuild / scalaVersion := "3.6.4"
 
 ThisBuild / semanticdbEnabled := true
 
@@ -22,7 +22,7 @@ lazy val root = (project in file("."))
       "org.testcontainers"  % "postgresql"             % "1.20.4",
       "com.zaxxer"          % "HikariCP"               % "6.2.1",
       // Iron
-      "io.github.iltotore" %% "iron"                   % "2.6.0",
+      "io.github.iltotore" %% "iron"                   % "3.0.0",
       // Logging
       "dev.zio"            %% "zio-logging-jul-bridge" % "2.4.0"
     )

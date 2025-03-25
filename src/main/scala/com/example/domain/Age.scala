@@ -7,4 +7,4 @@ type AgeDescription = DescribedAs[Greater[0], "Employee's age should be strictly
 
 type Age = Int :| AgeDescription
 
-object Age extends RefinedTypeOps[Int, AgeDescription, Age]
+object Age extends RefinedType[Int, AgeDescription]

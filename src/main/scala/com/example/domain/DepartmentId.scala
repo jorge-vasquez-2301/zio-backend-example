@@ -7,4 +7,4 @@ type DepartmentIdDescription = DescribedAs[Greater[0], "Department's ID should b
 
 type DepartmentId = Int :| DepartmentIdDescription
 
-object DepartmentId extends RefinedTypeOps[Int, DepartmentIdDescription, DepartmentId]
+object DepartmentId extends RefinedType[Int, DepartmentIdDescription]

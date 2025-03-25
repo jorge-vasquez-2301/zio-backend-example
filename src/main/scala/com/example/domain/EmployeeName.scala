@@ -11,4 +11,4 @@ type EmployeeNameDescription =
 
 type EmployeeName = String :| EmployeeNameDescription
 
-object EmployeeName extends RefinedTypeOps[String, EmployeeNameDescription, EmployeeName]
+object EmployeeName extends RefinedType[String, EmployeeNameDescription]

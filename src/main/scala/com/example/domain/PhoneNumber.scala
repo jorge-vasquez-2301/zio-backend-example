@@ -11,4 +11,4 @@ type PhoneNumberDescription =
 
 type PhoneNumber = String :| PhoneNumberDescription
 
-object PhoneNumber extends RefinedTypeOps[String, PhoneNumberDescription, PhoneNumber]
+object PhoneNumber extends RefinedType[String, PhoneNumberDescription]

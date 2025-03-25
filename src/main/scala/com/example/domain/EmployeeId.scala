@@ -7,4 +7,4 @@ type EmployeeIdDescription = DescribedAs[Greater[0], "Employee's ID should be st
 
 type EmployeeId = Int :| EmployeeIdDescription
 
-object EmployeeId extends RefinedTypeOps[Int, EmployeeIdDescription, EmployeeId]
+object EmployeeId extends RefinedType[Int, EmployeeIdDescription]

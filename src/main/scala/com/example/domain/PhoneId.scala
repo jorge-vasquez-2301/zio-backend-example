@@ -7,4 +7,4 @@ type PhoneIdDescription = DescribedAs[Greater[0], "Phone's ID should be strictly
 
 type PhoneId = Int :| PhoneIdDescription
 
-object PhoneId extends RefinedTypeOps[Int, PhoneIdDescription, PhoneId]
+object PhoneId extends RefinedType[Int, PhoneIdDescription]
