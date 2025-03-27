@@ -14,7 +14,7 @@ lazy val root = (project in file("."))
     ),
     libraryDependencies ++= Seq(
       // ZIO HTTP
-      "dev.zio"            %% "zio-http"               % "3.1.0",
+      "dev.zio"            %% "zio-http"               % "3.2.0",
       // Database
       "com.augustnagro"    %% "magnumzio"              % "2.0.0-M1",
       "org.postgresql"      % "postgresql"             % "42.7.5",
